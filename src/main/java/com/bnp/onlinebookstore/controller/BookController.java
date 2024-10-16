@@ -18,7 +18,7 @@ public class BookController {
     @GetMapping("/all")
     public ResponseEntity<List<Book>> fetchAllBooks() {
         List<Book> books = bookService.findAllBooks();
-        return ResponseEntity.ok(books);
+        return new ResponseEntity<>(books,HttpStatus.OK);
     }
 
     @PostMapping("/add")

@@ -78,3 +78,51 @@ Endpoint: GET http://localhost:8080/api/books/all
 3. Find Book By ID : Retrieves details of a specific book by its ID.
 
 Endpoint: GET http://localhost:8080/api/books/1
+
+### Books Management
+
+Cart Management : Add Book in to Cart , Retrieve cart items by user Id update cart and remove item from cart
+
+1.AddToCart: When user wants to add books into cart.
+
+Endpoint: POST http://localhost:8080/api/cart/add
+
+Request Body:
+
+{
+    "bookId": 1,
+    "userId": 1,
+    "quantity": 2
+}
+
+2.Retrieve books for cart : FetchCartItemByUserId
+
+Endpoint: GET http://localhost:8080/api/cart/user/1
+
+3. Update Cart : Update Cart based on Quantity.
+
+Endpoint: PUT http://localhost:8080/api/cart/update
+
+{
+    "cartItemId":1,
+    "userId": 1,
+    "bookId": 1,
+    "quantity": 3
+}
+
+4.Remove Book from cart
+
+Endpoint : http://localhost:8080/api/cart/remove?bookId=1&userId=1
+
+
+## Order Processing
+
+Order Checkout : If a user add two books with different quantites this api will tell how much it cost to user and when the order is placed
+
+Endpoint : POST http://localhost:8080/api/orders/checkout
+
+PAYLOAD
+
+{
+"userId":1
+}
