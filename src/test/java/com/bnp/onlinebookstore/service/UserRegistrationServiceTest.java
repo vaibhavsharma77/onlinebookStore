@@ -1,6 +1,8 @@
 package com.bnp.onlinebookstore.service;
 
+import com.bnp.onlinebookstore.dto.LoginRequest;
 import com.bnp.onlinebookstore.dto.UserRegisterRequest;
+import com.bnp.onlinebookstore.exception.UserAlreadyExistsException;
 import com.bnp.onlinebookstore.model.User;
 import com.bnp.onlinebookstore.repository.UserRepository;
 import org.junit.jupiter.api.Test;
@@ -14,8 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 public class UserRegistrationServiceTest {
@@ -52,10 +53,41 @@ public class UserRegistrationServiceTest {
         Mockito.when(userRepository.findByUserName("user1")).thenReturn(Optional.of(new User()));
 
         //when
-        assertThrows(RuntimeException.class,()->{
+        assertThrows(UserAlreadyExistsException.class,()->{
             userRegistrationService.register(userRegisterRequest);
         });
         //then
         Mockito.verify(userRepository,Mockito.never()).save(Mockito.any(User.class));
+    }
+
+    @Test
+    public void shouldAllowLoginForValidUser(){
+        //given
+        LoginRequest loginRequest=new LoginRequest("user1","password1");
+        User user=User.builder()
+                .userName("user1")
+                .password("encodedPassword")
+                .build();
+        Mockito.when(userRepository.findByUserName("user1")).thenReturn(Optional.of(user));
+        Mockito.when(passwordEncoder.matches("password1","encodedPassword")).thenReturn(true);
+        //when
+        boolean loginAllowed = userRegistrationService.isLoginAllowed(loginRequest);
+        assertTrue(loginAllowed);
+    }
+
+
+    @Test
+    public void shouldNotAllowLoginForInValidUser(){
+        //given
+        LoginRequest loginRequest=new LoginRequest("user1","wrong-password");
+        User user=User.builder()
+                .userName("user1")
+                .password("encodedPassword")
+                .build();
+        Mockito.when(userRepository.findByUserName("user1")).thenReturn(Optional.of(user));
+        Mockito.when(passwordEncoder.matches("wrong-password","encodedPassword")).thenReturn(false);
+        //when
+        boolean loginAllowed = userRegistrationService.isLoginAllowed(loginRequest);
+        assertFalse(loginAllowed);
     }
 }
